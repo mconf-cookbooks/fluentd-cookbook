@@ -3,6 +3,7 @@
 # Recipe:: default
 #
 # Copyright 2013, Dmytro Kovalov
+# Copyright 2015, Felipe Cecagno
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,13 +19,11 @@
 #
 group 'fluent' do
   group_name 'fluent'
-  gid        403
   action     [:create]
 end
 
 user 'fluent' do
   comment  'fluent'
-  uid      403
   group    'fluent'
   home     '/var/run/fluent'
   shell    '/bin/false'
@@ -33,6 +32,11 @@ user 'fluent' do
   action   [:create, :manage]
 end
 
+directory "/etc/fluent/config.d" do
+  recursive true
+  action :delete
+  only_if { node['fluentd']['clear_configs'] }
+end
 
 %w{ /etc/fluent/ /etc/fluent/config.d/ /var/log/fluent/ }.each do |dir|
   directory dir do
@@ -60,29 +64,34 @@ service "fluent" do
   supports [ :enable, :start, :restart ]
 end
 
-node[:fluentd][:plugins].each do |plugin|
+node['fluentd']['plugins'].each do |plugin|
   gem_package "fluent-plugin-#{plugin}"
 end
 
 #
 # Handle sources and matches configuration
 #
-if node[:fluentd][:configs]
-  node[:fluentd][:configs][:source].each do |config|
-    template "#{config[:tag]}" do
-      path      "/etc/fluent/config.d/source_#{config[:tag]}.conf"
+node['fluentd']['configs'].each do |data_bag_id|
+  data_bag = Chef::DataBagItem.load(node['fluentd']['data_bag_name'], data_bag_id).raw_data
+
+  data_bag['source'].each do |config|
+    cfg = config.dup
+    template "#{config['tag']}" do
+      path      "/etc/fluent/config.d/source_#{config['tag']}.conf"
+      helpers(Fluentd::Helpers)
       source    "plugin_source.conf.erb"
-      variables config
+      variables({ :attributes => cfg })
       notifies :restart, "service[fluent]", :delayed
     end
   end
 
-  node[:fluentd][:configs][:match].each do |config|
+  data_bag['match'].each do |config|
     cfg = config.dup
-    template "#{cfg[:match]}" do
-      path      "/etc/fluent/config.d/match_#{cfg[:match]}.conf"
+    template "#{cfg['match']}" do
+      path      "/etc/fluent/config.d/match_#{cfg['match']}.conf"
+      helpers(Fluentd::Helpers)
       source    "plugin_match.conf.erb"
-      variables({ :match => cfg.delete(:match), :type => cfg.delete(:type), :attributes => cfg })
+      variables({ :match => cfg.delete('match'), :attributes => cfg })
       notifies :restart, "service[fluent]", :delayed
     end
   end

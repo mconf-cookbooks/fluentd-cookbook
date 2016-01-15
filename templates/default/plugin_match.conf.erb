@@ -1,5 +1,5 @@
+# Created automatically by Chef, do not modify it manually
+
 <match <%= @match %>>
-     type   <%= @type %>
-     <% @attributes.keys.each do |key| -%><%= key -%>		<%= @attributes[key] %>
-     <% end -%>
+<%= print_hash(@attributes, 0, 4).chomp %>
 </match>
