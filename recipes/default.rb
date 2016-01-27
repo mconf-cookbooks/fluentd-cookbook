@@ -83,7 +83,7 @@ node['fluentd']['configs'].each do |data_bag_id|
       variables({ :attributes => cfg })
       notifies :restart, "service[fluent]", :delayed
     end
-  end
+  end unless data_bag['source'].nil?
 
   data_bag['match'].each do |config|
     cfg = config.dup
@@ -94,5 +94,5 @@ node['fluentd']['configs'].each do |data_bag_id|
       variables({ :match => cfg.delete('match'), :attributes => cfg })
       notifies :restart, "service[fluent]", :delayed
     end
-  end
+  end unless data_bag['match'].nil?
 end
