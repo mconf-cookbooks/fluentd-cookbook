@@ -17,15 +17,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-group 'fluent' do
-  group_name 'fluent'
+group node['fluentd']['group'] do
+  group_name node['fluentd']['group']
   action     [:create]
 end
 
-user 'fluent' do
+user node['fluentd']['user'] do
   comment  'fluent'
-  group    'fluent'
-  home     '/var/run/fluent'
+  group    node['fluentd']['group']
+  home     "/var/run/#{node['fluentd']['user']}"
   shell    '/bin/false'
   password nil
   supports :manage_home => true
@@ -40,8 +40,8 @@ end
 
 %w{ /etc/fluent/ /etc/fluent/config.d/ /var/log/fluent/ }.each do |dir|
   directory dir do
-    owner  'fluent'
-    group  'fluent'
+    owner  node['fluentd']['user']
+    group  node['fluentd']['group']
     mode   '0755'
     action :create
   end

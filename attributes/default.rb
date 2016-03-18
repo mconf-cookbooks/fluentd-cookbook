@@ -15,6 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-default['fluentd']['configs'] = []
+
+default['fluentd']['user']  = "fluent"
+default['fluentd']['group'] = "fluent"
+
+default['fluentd']['configs']       = []
 default['fluentd']['clear_configs'] = false
 default['fluentd']['data_bag_name'] = "fluentd"
