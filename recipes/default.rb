@@ -95,4 +95,15 @@ node['fluentd']['configs'].each do |data_bag_id|
       notifies :restart, "service[fluent]", :delayed
     end
   end unless data_bag['match'].nil?
+
+  data_bag['filter'].each do |config|
+    cfg = config.dup
+    template "#{cfg['filter']}" do
+      path      "/etc/fluent/config.d/filter_#{cfg['match']}.conf"
+      helpers(Fluentd::Helpers)
+      source    "plugin_filter.conf.erb"
+      variables({ :match => cfg.delete('match'), :attributes => cfg })
+      notifies :restart, "service[fluent]", :delayed
+    end
+  end unless data_bag['filter'].nil?
 end
