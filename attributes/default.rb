@@ -19,6 +19,7 @@
 default['fluentd']['user']  = "fluent"
 default['fluentd']['group'] = "fluent"
 
+default['fluentd']['plugins']       = []
 default['fluentd']['configs']       = []
 default['fluentd']['clear_configs'] = false
 default['fluentd']['data_bag_name'] = "fluentd"
