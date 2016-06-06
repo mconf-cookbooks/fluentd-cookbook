@@ -38,7 +38,7 @@ directory "/etc/fluent/config.d" do
   only_if { node['fluentd']['clear_configs'] }
 end
 
-%w{ /etc/fluent/ /etc/fluent/config.d/ /var/log/fluent/ }.each do |dir|
+%w{ /etc/fluent/ /etc/fluent/config.d/ /var/log/fluent/ /usr/local/fluent/ }.each do |dir|
   directory dir do
     owner  node['fluentd']['user']
     group  node['fluentd']['group']
@@ -57,15 +57,25 @@ template "/etc/init.d/fluent" do
   source "fluent.init_d.erb"
 end
 
-gem_package "fluentd"
+template "/usr/local/fluent/Gemfile" do
+  source "Gemfile.erb"
+  variables ({
+    :fluentd_version => node['fluentd']['gem_version'],
+    :plugins => node['fluentd']['plugins']
+  })
+end
+
+gem_package "bundler"
+
+execute "install fluent" do
+  cwd "/usr/local/fluent/"
+  command "bundle install"
+  action :run
+end
 
 service "fluent" do
   action :nothing
   supports [ :enable, :start, :restart ]
-end
-
-node['fluentd']['plugins'].each do |plugin|
-  gem_package "fluent-plugin-#{plugin}"
 end
 
 #

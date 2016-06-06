@@ -1,0 +1,9 @@
+source "https://rubygems.org"
+
+gem "fluentd", "<%= @fluentd_version %>"
+<% @plugins.each do |plugin| %>
+  <% match = /^(?<gem_name>[^ ]*)( \((?<gem_version>[\d\.]*)\))?$/.match(plugin) %>
+  <% unless match.nil? or match[:gem_name].nil? %>
+gem "fluent-plugin-<%= match[:gem_name] %>"<% if ! match[:gem_version].nil? %>, "<%= match[:gem_version] %>"<% end %>
+  <% end %>
+<% end %>

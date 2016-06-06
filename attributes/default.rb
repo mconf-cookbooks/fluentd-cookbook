@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+default['fluentd']['gem_version'] = "0.12.26" # latest version compatible with ruby 1.9.x
 default['fluentd']['user']  = "fluent"
 default['fluentd']['group'] = "fluent"
 
