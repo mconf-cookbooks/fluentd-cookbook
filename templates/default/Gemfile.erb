@@ -1,5 +1,10 @@
 source "https://rubygems.org"
 
+# the installation breaks for newer versions of json
+<% if Gem::Dependency.new('', '~> 0.12.0').match?('', @fluentd_version) %>
+gem "json", "1.8.3"
+<% end %>
+
 gem "fluentd", "<%= @fluentd_version %>"
 <% @plugins.each do |plugin| %>
   <% match = /^(?<gem_name>[^ ]*)( \((?<gem_version>[\d\.]*)\))?$/.match(plugin) %>

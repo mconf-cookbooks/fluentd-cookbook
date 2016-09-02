@@ -64,6 +64,9 @@ template "/usr/local/fluent/Gemfile" do
     :plugins => node['fluentd']['plugins']
   })
 end
+file "/usr/local/fluent/Gemfile.lock" do
+  action :delete
+end
 
 gem_package "bundler"
 
