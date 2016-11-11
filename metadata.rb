@@ -10,6 +10,8 @@ version          '0.0.7'
   supports os
 end
 
+depends 'apt', '>= 2.9'
+
 attribute "fluentd/plugins",
   :display_name => "List of plugins",
   :description => "List of plugins to install together with fluentd",

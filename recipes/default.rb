@@ -68,6 +68,16 @@ file "/usr/local/fluent/Gemfile.lock" do
   action :delete
 end
 
+if node['fluentd']['ruby']['packages']
+  apt_repository 'ruby-ng' do
+    uri 'ppa:brightbox/ruby-ng'
+    components ['main']
+  end
+  node['fluentd']['ruby']['packages'].each do |name|
+    package name
+  end
+end
+
 gem_package "bundler"
 
 execute "install fluent" do

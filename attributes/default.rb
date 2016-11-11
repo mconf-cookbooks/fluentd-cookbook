@@ -24,3 +24,10 @@ default['fluentd']['plugins']       = []
 default['fluentd']['configs']       = []
 default['fluentd']['clear_configs'] = false
 default['fluentd']['data_bag_name'] = "fluentd"
+
+# Ruby. If the version is set to nil ruby will not be installed.
+default['fluentd']['ruby']['version'] = "2.3"
+default['fluentd']['ruby']['packages'] = [
+  "ruby#{node['fluentd']['ruby']['version']}",
+  "ruby#{node['fluentd']['ruby']['version']}-dev"
+]
